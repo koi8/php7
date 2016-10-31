@@ -23,8 +23,10 @@ RUN apt-get update && apt-get install -y \
     curl \
     libcurl4-gnutls-dev \
     libexif-dev \
-    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
-    && docker-php-ext-install gd opcache iconv mcrypt pdo_pgsql pdo_mysql mbstring mysqli soap intl zip curl exif bcmath \
+    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ \
+    --with-jpeg-dir=/usr/include/ \
+    && docker-php-ext-install gd opcache iconv mcrypt pdo_pgsql \
+    pdo_mysql mbstring mysqli soap intl zip curl exif bcmath \
     && pecl install imagick \
     && docker-php-ext-enable imagick \ 
     && rm -r /var/lib/apt/lists/* \
