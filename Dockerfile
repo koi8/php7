@@ -1,4 +1,4 @@
-FROM php:7.0.12-fpm
+FROM php:7.0.13-fpm
 RUN apt-get update && apt-get install -y \
     libfreetype6-dev \
     libjpeg62-turbo-dev \
@@ -26,7 +26,7 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-install gd opcache iconv mcrypt pdo_pgsql pdo_mysql mbstring mysqli soap intl zip curl exif bcmath \
     && pecl install imagick \
-    && docker-php-ext-enable imagick \ 
+    && docker-php-ext-enable imagick \
     && rm -r /var/lib/apt/lists/* \
     && rm -r /var/cache/apt/*
 
@@ -57,7 +57,7 @@ RUN curl -L -o /tmp/memcached.tar.gz "https://github.com/php-memcached-dev/php-m
     && rm /tmp/memcached.tar.gz \
     && docker-php-ext-enable memcached
 
-RUN apt-get autoremove 
+RUN apt-get autoremove
 
 COPY ./php.ini /usr/local/etc/php/conf.d/php.ini
 COPY ./php-fpm.d/www.conf /usr/local/etc/php-fpm.d/www.conf
