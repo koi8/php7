@@ -1,4 +1,4 @@
-FROM php:7.0.13-fpm
+FROM php:7.0.14-fpm
 RUN apt-get update && apt-get install -y \
     libfreetype6-dev \
     libjpeg62-turbo-dev \
@@ -32,15 +32,15 @@ RUN apt-get update && apt-get install -y \
     && rm -r /var/lib/apt/lists/* \
     && rm -r /var/cache/apt/*
 
-RUN git clone git://github.com/alanxz/rabbitmq-c.git \
+RUN cd /tmp && git clone git://github.com/alanxz/rabbitmq-c.git \
     && cd rabbitmq-c \
     && git submodule init \
     && git submodule update \
     && autoreconf -i \
     && ./configure --prefix=/usr/local/ \
     && make -j$(nproc) \
-    && make install
-
+    && make install \
+    && rm -rf /tmp/*
 
 RUN pecl install redis amqp \
     && docker-php-ext-enable redis amqp
