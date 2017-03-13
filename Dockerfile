@@ -58,7 +58,7 @@ RUN pecl install redis \
     && tar -xvf amqp-1.8.0.tgz \
     && cd /tmp/amqp-1.8.0 \
     && phpize \
-    && ./configure --with-librabbitmq-dir=/usr/local/lib/ \
+    && ./configure --with-librabbitmq-dir=/usr/local/ \
     && make -j$(nproc) \
     && make install \
     && docker-php-ext-enable redis amqp
