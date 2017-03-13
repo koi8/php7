@@ -35,6 +35,7 @@ RUN apk upgrade --update && apk add \
     libexif-dev \
     postgresql-dev \
     imagemagick-dev \
+    libmemcached-dev \
     re2c \
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ \
     --with-jpeg-dir=/usr/include/ \
@@ -70,7 +71,7 @@ RUN cd /tmp \
     && ( \
         cd /tmp/memcached \
         && phpize \
-        && ./configure --with-libmemcached-dir=/usr/local/ \
+        && ./configure  \
         && make -j$(nproc) \
         && make install \
     ) \
