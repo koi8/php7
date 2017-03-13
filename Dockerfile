@@ -63,17 +63,18 @@ RUN pecl install redis \
     && make install \
     && docker-php-ext-enable redis amqp
 
-RUN curl -L -o /tmp/memcached.tar.gz "https://github.com/php-memcached-dev/php-memcached/archive/php7.tar.gz" \
-    && mkdir -p memcached \
-    && tar -C memcached -zxvf /tmp/memcached.tar.gz --strip 1 \
+RUN cd /tmp \
+    && curl -L -o /tmp/memcached.tar.gz "https://github.com/php-memcached-dev/php-memcached/archive/php7.tar.gz" \
+    && mkdir -p /tmp/memcached \
+    && tar -C /tmp/memcached -zxvf /tmp/memcached.tar.gz --strip 1 \
     && ( \
-        cd memcached \
+        cd /tmp/memcached \
         && phpize \
-        && ./configure \
+        && ./configure --with-libmemcached-dir=/usr/local/ \
         && make -j$(nproc) \
         && make install \
     ) \
-    && rm -r memcached \
+    && rm -r /tmp/memcached \
     && rm /tmp/memcached.tar.gz \
     && docker-php-ext-enable memcached
 
