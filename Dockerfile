@@ -1,4 +1,4 @@
-FROM php:7.0.21-fpm-alpine
+FROM php:7.0.23-fpm-alpine
 RUN apk upgrade --update && apk add \
     coreutils \
     autoconf \
@@ -57,9 +57,9 @@ RUN cd /tmp && git clone git://github.com/alanxz/rabbitmq-c.git \
 
 RUN pecl install redis \
     && cd /tmp \
-    && wget https://pecl.php.net/get/amqp-1.8.0.tgz \
-    && tar -xvf amqp-1.8.0.tgz \
-    && cd /tmp/amqp-1.8.0 \
+    && wget https://pecl.php.net/get/amqp-1.9.1.tgz \
+    && tar -xvf amqp-1.9.1.tgz \
+    && cd /tmp/amqp-1.9.1 \
     && phpize \
     && ./configure --with-librabbitmq-dir=/usr/local/ \
     && make -j$(nproc) \
