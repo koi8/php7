@@ -1,36 +1,52 @@
-FROM php:7.0.12-fpm
-RUN apt-get update && apt-get install -y \
-    libfreetype6-dev \
-    libjpeg62-turbo-dev \
-    libmcrypt-dev \
-    libpng12-dev \
+FROM php:7.0.23-fpm-alpine
+RUN apk upgrade --update && apk add \
+    coreutils \
+    autoconf \
+    build-base \
+    pcre-dev \
+    gcc \
+    g++ \
+    make \
     automake \
+    file \
     libtool \
-    libmemcached-dev \
-    libfreetype6-dev \
+    freetype-dev \
+    libjpeg-turbo-dev \
+    libltdl \
     libmcrypt-dev \
-    libpq-dev \
-    libpng12-dev \
-    libjpeg62-turbo-dev \
+    libpng-dev \
+    gettext-dev \
+    openssl \
+    libintl \
+    icu-dev \
+    openldap-dev \
+    freetype \
+    libjpeg-turbo-dev \
+    libpng-dev \
+    ttf-dejavu \
     mysql-client \
-    pkg-config \
+    pkgconfig \
     libxml2-dev \
     libxml2 \
     git \
-    libicu-dev \
-    libmagickwand-dev \
+    icu-libs \
     unzip \
     curl \
-    libcurl4-gnutls-dev \
+    curl-dev \
+    libcurl \
     libexif-dev \
-    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
-    && docker-php-ext-install gd opcache iconv mcrypt pdo_pgsql pdo_mysql mbstring mysqli soap intl zip curl exif bcmath \
+    postgresql-dev \
+    imagemagick-dev \
+    libmemcached-dev \
+    re2c \
+    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ \
+    --with-jpeg-dir=/usr/include/ \
+    && docker-php-ext-install gd opcache iconv mcrypt pdo_pgsql \
+    pdo_mysql mbstring mysqli soap intl zip curl exif bcmath \
     && pecl install imagick \
-    && docker-php-ext-enable imagick \ 
-    && rm -r /var/lib/apt/lists/* \
-    && rm -r /var/cache/apt/*
+    && docker-php-ext-enable imagick
 
-RUN git clone git://github.com/alanxz/rabbitmq-c.git \
+RUN cd /tmp && git clone git://github.com/alanxz/rabbitmq-c.git \
     && cd rabbitmq-c \
     && git submodule init \
     && git submodule update \
@@ -39,25 +55,33 @@ RUN git clone git://github.com/alanxz/rabbitmq-c.git \
     && make -j$(nproc) \
     && make install
 
-
-RUN pecl install redis amqp \
+RUN pecl install redis \
+    && cd /tmp \
+    && wget https://pecl.php.net/get/amqp-1.9.1.tgz \
+    && tar -xvf amqp-1.9.1.tgz \
+    && cd /tmp/amqp-1.9.1 \
+    && phpize \
+    && ./configure --with-librabbitmq-dir=/usr/local/ \
+    && make -j$(nproc) \
+    && make install \
     && docker-php-ext-enable redis amqp
 
-RUN curl -L -o /tmp/memcached.tar.gz "https://github.com/php-memcached-dev/php-memcached/archive/php7.tar.gz" \
-    && mkdir -p memcached \
-    && tar -C memcached -zxvf /tmp/memcached.tar.gz --strip 1 \
+RUN cd /tmp \
+    && curl -L -o /tmp/memcached.tar.gz "https://github.com/php-memcached-dev/php-memcached/archive/php7.tar.gz" \
+    && mkdir -p /tmp/memcached \
+    && tar -C /tmp/memcached -zxvf /tmp/memcached.tar.gz --strip 1 \
     && ( \
-        cd memcached \
+        cd /tmp/memcached \
         && phpize \
-        && ./configure \
+        && ./configure  \
         && make -j$(nproc) \
         && make install \
     ) \
-    && rm -r memcached \
+    && rm -r /tmp/memcached \
     && rm /tmp/memcached.tar.gz \
     && docker-php-ext-enable memcached
 
-RUN apt-get autoremove 
+RUN rm -rf /var/cache/apk/*
 
 COPY ./php.ini /usr/local/etc/php/conf.d/php.ini
 COPY ./php-fpm.d/www.conf /usr/local/etc/php-fpm.d/www.conf
